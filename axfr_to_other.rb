@@ -1,5 +1,11 @@
 #!/usr/bin/ruby
 
+# Utility to convert a zone transfer format file (input) to character separated values (example: csv)
+# USage: <this-script> <axfr-format-file> [separator (default=comma)]
+
+# Zonefile := <Resourcerecords>*
+# Resourcerecords := A|CNAME|TXT|MX|HINFO
+
 class Zonefile
 
     def initialize(axfr_file_name,separator)
@@ -44,12 +50,10 @@ class Resourcerecord
   protected
   attr_accessor :name, :type, :value
 
-
   public
-
   def initialize(line)
     line_parts=line.split()
-    (@name,@type,@value)=line_parts[0],line_parts[3],line_parts[4]
+    @name,@type,@value=line_parts[0],line_parts[3],line_parts[4]
   end
 
   def to_any_sv(sep)
@@ -66,9 +70,8 @@ class RR_cname < Resourcerecord
   # Code is in base class, no overriding required
 end
 
+# Special handling of 'value' field for MX
 class RR_mx < Resourcerecord
-
-  public
   def initialize(line)
     # When you invoke super with no arguments Ruby sends a message to the parent of the current object, 
     # asking it to invoke a method of the same name as the method invoking super. It automatically forwards 
@@ -76,6 +79,7 @@ class RR_mx < Resourcerecord
     super
     # Now override just 'value' attribute in base class
     line_parts=line.split();
+    #      <weight>              <mail-server>
     @value=line_parts[4] + " " + line_parts[5]
   end
 end
