@@ -22,6 +22,9 @@ class Zonefile
         elsif (line =~ /(\s+)(MX)(\s+)/)
           mx_obj = RR_mx.new(line)
           @rr_entries.push(mx_obj)
+        elsif (line =~ /(\s+)(HINFO)(\s+)/)
+          hinfo_obj = RR_hinfo.new(line)
+          @rr_entries.push(hinfo_obj)
         else
           ; # Do nothing for other Resource records
         end
@@ -34,108 +37,63 @@ class Zonefile
        end
       print "\n"
     end
-
 end
 
+# Base class common for most resource_records
 class Resourcerecord
   protected
-  attr_accessor :name, :type
+  attr_accessor :name, :type, :value
+
 
   public
+
   def initialize(line)
     line_parts=line.split()
-    #(@name,@type,@value)=line_parts[0],line_parts[3],line_parts[4]
-    (@name,@type)=line_parts[0],line_parts[3]
+    (@name,@type,@value)=line_parts[0],line_parts[3],line_parts[4]
   end
 
   def to_any_sv(sep)
-    #print "\n#{name},#{type},#{value}"
-    print "\n#{name}#{sep}#{type}"
+    print "\n#{name}#{sep}#{type}#{sep}#{value}"
   end
 end
 
 
 class RR_a < Resourcerecord
-  protected
-  attr_accessor :value
-
-  public
-  def initialize(line)
-    super(line)
-    @value=line.split()[4];
-  end
-  def to_any_sv(sep=",")
-    super(sep)    
-    print "#{sep}#{value}"
-  end
+  # Code is in base class, no overriding required
 end
 
 class RR_cname < Resourcerecord
-  protected
-  attr_accessor :value
-
-  public
-  def initialize(line)
-    super(line)
-    @value=line.split()[4];
-  end
-  def to_any_sv(sep=",")
-    super(sep)    
-    print "#{sep}#{value}"
-  end
+  # Code is in base class, no overriding required
 end
 
 class RR_mx < Resourcerecord
-  protected
-  attr_accessor :value
 
   public
   def initialize(line)
-    # Override
-    super(line)
+    # When you invoke super with no arguments Ruby sends a message to the parent of the current object, 
+    # asking it to invoke a method of the same name as the method invoking super. It automatically forwards 
+    # the arguments that were passed to the method from which it's called.
+    super
+    # Now override just 'value' attribute in base class
     line_parts=line.split();
     @value=line_parts[4] + " " + line_parts[5]
-  end
-  def to_any_sv(sep=",")
-    super(sep)    
-    print "#{sep}#{value}"
   end
 end
 
 class RR_txt < Resourcerecord
-  protected
-  attr_accessor :value
-
-  public
-  def initialize(line)
-    super(line)
-    @value=line.split()[4];
-  end
-  def to_any_sv(sep=",")
-    super(sep)    
-    print "#{sep}#{value}"
-  end
+  # Code is in base class, no overriding required
 end
 
 class RR_hinfo < Resourcerecord
-  protected
-  attr_accessor :value
-
-  public
-  def initialize(line)
-    super(line)
-    @value=line.split()[4];
-  end
-  def to_any_sv(sep=",")
-    super(sep)    
-    print "#{sep}#{value}"
-  end
+  # Code is in base class, no overriding required
 end
 
+# Helper function
 def usage()
   print "\nUSAGE: #{$0} <axfr-file-name> [separator-char]\n"
 end
 
+# Main function
 def main(arg_array)
   (axfr_file_name,separator) = arg_array[0..1]
 
@@ -148,6 +106,10 @@ def main(arg_array)
   zf.to_any_sv()
 end
 
+# 
+## Main starts here
+#
 if __FILE__ == $0
     main(ARGV)
 end
+
