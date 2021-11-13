@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+# "1.1" < "1.2" returns >0
+# "1.2.1" >"1.1" returns >0
+# "1.9"<1.8" returns <0
+# "1.1.1.1" "1.1.1.1" returns 0
 def ver_cmp(version1,version2)
   v_int_lista=version1.split(".").map { |x| x.to_i() }
   v_int_listb=version2.split(".").map { |x| x.to_i() }
